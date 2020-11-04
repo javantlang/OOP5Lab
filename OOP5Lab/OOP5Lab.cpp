@@ -32,6 +32,47 @@ public:
     {
         return (name == classname());
     }
+    void getCoord()
+    {
+        cout << "x = " << x << "; y = " << y << "\n";
+    }
+
+    //НЕ переопределяемый
+    void Move(int dx, int dy)
+    {
+        x += dx;
+        y += dy;
+    }
+
+    //----------------------------------------------
+
+    /*НЕ переопределяемы метод,
+    * вызывает не виртуальный метод oneStep,
+    * который переопределён у класса-потомка
+    */
+    void MakesomeSteps(int amount)
+    {
+        while (amount)
+        {
+            oneStep();
+            --amount;
+        }
+    }
+
+    //Переопределяемый метод
+    void oneStep()
+    {
+        ++x;
+        ++y;
+    }
+
+    //----------------------------------------------
+
+    //Переопределяемый метод
+    void Draw()
+    {
+        cout << "Draw Point\n";
+    }
 
     virtual  ~Point()
     {
@@ -66,6 +107,17 @@ public:
     virtual bool isA(string name)
     {
         return (name == classname() || Point::isA(name));
+    }
+
+    void Draw()
+    {
+        cout << "Draw Circle\n";
+    }
+
+    void oneStep()
+    {
+        x += r;
+        y += r;
     }
 
     ~Circle()
@@ -108,6 +160,17 @@ public:
         return (name == classname() || Point::isA(name));
     }
 
+    void Draw()
+    {
+        cout << "Draw Rectangle\n";
+    }
+
+    void oneStep()
+    {
+        x += width;
+        y += height;
+    }
+
     ~Rectangle()
     {
         x = 0;
@@ -119,5 +182,5 @@ public:
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    
 }
