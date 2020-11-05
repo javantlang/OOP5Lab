@@ -1,23 +1,26 @@
 ﻿#include <iostream>
+#include <time.h>
 
 using namespace std;
 
-class Point
+const int N = 10;
+
+class Shape
 {
 protected:
     int x;
     int y;
-    Point()
+    Shape()
     {
-        x = 0;
-        y = 0;
+        this->x = 0;
+        this->y = 0;
     }
-    Point(int x, int y)
+    Shape(int x, int y)
     {
         this->x = x;
         this->y = y;
     }
-    Point(Point& p)
+    Shape(Shape& p)
     {
         x = p.x;
         y = p.y;
@@ -26,20 +29,21 @@ protected:
 public:
     virtual string classname()
     {
-        return "Point\n";
+        return "Shape";
     }
     virtual bool isA(string name)
     {
-        return (name == classname());
+        return (name == "Shape");
     }
-    void getCoord()
+    virtual void getCoord()
     {
-        cout << "x = " << x << "; y = " << y << "\n";
+        cout << classname() <<"(" << x << ", " << y << ")\n";
     }
 
     //НЕ переопределяемый
     void Move(int dx, int dy)
     {
+        cout << classname() << "isMoving" << "\n";
         x += dx;
         y += dy;
     }
@@ -68,30 +72,54 @@ public:
 
     //----------------------------------------------
 
+    /*НЕ переопределяемы метод,
+    * вызывает виртуальный метод Round,
+    * который переопределён у класса-потомка
+    */
+    void RoundsomeTime(int amount)
+    {
+        while (amount)
+        {
+            Round();
+            --amount;
+        }
+        cout << '\n';
+    }
+
+    virtual void Round()
+    {
+        cout << "Shape is round~\n";
+    }
+
+    //----------------------------------------------
+
     //Переопределяемый метод
     void Draw()
     {
-        cout << "Draw Point\n";
+        cout << "Draw Shape\n";
     }
 
-    virtual  ~Point()
+    virtual  ~Shape()
     {
+        cout << "~Shape()\n";
         x = 0;
         y = 0;
     }
 };
 
-class Circle : Point
+class Circle : public Shape
 {
     int r;
 public:
-    Circle() : Point()
+    Circle() : Shape()
     {
         r = 0;
+        cout << "Circle()";
     }
-    Circle(int x, int y, int r) : Point(x, y)
+    Circle(int x, int y, int r) : Shape(x, y)
     {
         this->r = r;
+        cout << "Circle(" << x << ", " << y << ", " << r << ")\n";
     }
     Circle(Circle& c)
     {
@@ -102,11 +130,11 @@ public:
 
     virtual string classname()
     {
-        return "Circle\n";
+        return "Circle";
     }
     virtual bool isA(string name)
     {
-        return (name == classname() || Point::isA(name));
+        return (name == classname() || Shape::isA(name));
     }
 
     void Draw()
@@ -120,28 +148,41 @@ public:
         y += r;
     }
 
-    ~Circle()
+    virtual void Round()
     {
+        cout << "Circle is round~\n";
+    }
+
+    void Roll()
+    {
+        cout << "Circle is rolling\n";
+    }
+
+    virtual ~Circle()
+    {
+        cout << "~Circle()\n";
         x = 0;
         y = 0;
         r = 0;
     }
 };
 
-class Rectangle : Point
+class Rectangle : public Shape
 {
     int width;
     int height;
 public:
-    Rectangle() : Point()
+    Rectangle() : Shape()
     {
         width = 0;
         height = 0;
+        cout << "Rectangle()";
     }
-    Rectangle(int x, int y, int width, int height) : Point(x, y)
+    Rectangle(int x, int y, int width, int height) : Shape(x, y)
     {
         this->width = width;
         this->height = height;
+        cout << "Rectangle(" << x << ", " << y << ", " << width << ", " << height << ")\n";
     }
     Rectangle(Rectangle& r)
     {
@@ -153,11 +194,11 @@ public:
 
     virtual string classname()
     {
-        return "Rectangle\n";
+        return "Rectangle";
     }
     virtual bool isA(string name)
     {
-        return (name == classname() || Point::isA(name));
+        return (name == classname() || Shape::isA(name));
     }
 
     void Draw()
@@ -171,8 +212,19 @@ public:
         y += height;
     }
 
-    ~Rectangle()
+    virtual void Round()
     {
+        cout << "Rectangle is round~\n";
+    }
+
+    void Prick()
+    {
+        cout << "Rectangle is pricking\n";
+    }
+
+    virtual ~Rectangle()
+    {
+        cout << "~Rectangle()\n";
         x = 0;
         y = 0;
         width = 0;
@@ -180,7 +232,75 @@ public:
     }
 };
 
+void TestWithDef()
+{
+    cout << "ТЕСТ С ОБЪЕКТАМИ\n";
+    Circle* circleObj = new Circle(5, 5, 5);
+    Rectangle* rectObj = new Rectangle(3, 3, 3, 3);
+
+    //Вызов переопределяемых методов
+    circleObj->Draw();
+    rectObj->Draw();
+    //Вызов не переопределяемых методов
+    circleObj->Move(2, 2);
+    rectObj->Move(1, 1);
+    //Вызов виртуального метода в классах-потомках
+    circleObj->Round();
+    rectObj->Round();
+    //Вызов виртуального метода в базовом классе
+    circleObj->getCoord();
+    rectObj->getCoord();
+    delete circleObj;
+    delete rectObj;
+}
+
+void TestWithStore()
+{
+    cout << "ТЕСТ С ОБЪЕКТАМИ В ХРАНИЛИЩЕ\n";
+    Shape* shapeObj[N];
+
+    for (int i = 0; i < N; ++i)
+    {
+        if (rand() % 2 == 0)
+            shapeObj[i] = new Circle(rand() % 10, rand() % 10, rand() % 10);
+        else
+            shapeObj[i] = new Rectangle(rand() % 10, rand() % 10, rand() % 10, rand() % 10);
+    }
+
+    //Безопасное приведение типов вручную
+    cout << "БЕЗОПАСНОЕ ПРИВЕДЕНИЕ ТИПОВ\n";
+    for (int i = 0; i < N; ++i)
+    {
+        if (shapeObj[i]->isA("Circle"))
+            ((Circle*)shapeObj[i])->Roll();
+        if (shapeObj[i]->isA("Rectangle"))
+            ((Rectangle*)shapeObj[i])->Prick();
+    }
+
+    //ВЫЗОВ РАЗЛИЧНЫХ МЕТОДОВ У SHAPE
+    cout << "ВЫЗОВ РАЗЛИЧНЫХ МЕТОДОВ У SHAPE\n";
+    //Вызов переопределяемых методов
+	shapeObj[0]->Draw();
+    //Вызов не переопределяемых методов
+	shapeObj[0]->Move(2, 2);
+    //Вызов виртуального метода в классах-потомках
+	shapeObj[0]->Round();
+    //Вызов виртуального метода в базовом классе
+	shapeObj[0]->getCoord();
+    for (int i = 0; i < N; ++i)
+    {
+        delete shapeObj[i];
+    }
+}
+
 int main()
 {
-    
+    srand(time(0));
+    setlocale(0, "");
+
+    TestWithDef();
+
+    TestWithStore();
+
+    return 0;
 }
