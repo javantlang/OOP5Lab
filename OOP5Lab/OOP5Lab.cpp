@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <time.h>
+#define null NULL
 
 using namespace std;
 
@@ -268,7 +269,7 @@ void TestWithStore()
     }
 
     //Безопасное приведение типов вручную
-    cout << "БЕЗОПАСНОЕ ПРИВЕДЕНИЕ ТИПОВ\n";
+    cout << "БЕЗОПАСНОЕ ПРИВЕДЕНИЕ ТИПОВ ВРУЧНУЮ\n";
     for (int i = 0; i < N; ++i)
     {
         if (shapeObj[i]->isA("Circle"))
@@ -293,6 +294,45 @@ void TestWithStore()
     }
 }
 
+void DinamicCastFunc()
+{
+    cout << "ПРИВЕДЕНИЕ ТИПОВ С ПОМОЩЬЮ ДИНАМИК КАСТ\n";
+    Shape* shapeObj[N];
+
+    for (int i = 0; i < N; ++i)
+    {
+        if (rand() % 2 == 0)
+            shapeObj[i] = new Circle(rand() % 10, rand() % 10, rand() % 10);
+        else
+            shapeObj[i] = new Rectangle(rand() % 10, rand() % 10, rand() % 10, rand() % 10);
+    }
+
+    //Безопасное приведение типов через dinamic_cast
+    cout << "БЕЗОПАСНОЕ ПРИВЕДЕНИЕ ТИПОВ\n";
+    for (int i = 0; i < N / 2; ++i)
+    {
+        Circle* cir = dynamic_cast<Circle*>(shapeObj[i]);
+        if (cir != null)
+        {
+            cout << "Преобразование в круг успешно завершено\n";
+            cir->Roll();
+        }
+        else
+            cout << "Манёвр с кругом не удался\n";
+    }
+    for (int i = N / 2; i < N; ++i)
+    {
+        Rectangle* cir = dynamic_cast<Rectangle*>(shapeObj[i]);
+        if (cir != null)
+        {
+            cout << "Преобразование в прямоугольник успешно завершено\n";
+            cir->Prick();
+        }
+        else
+            cout << "Манёвр с прямоугольником не удался\n";
+    }
+}
+
 int main()
 {
     srand(time(0));
@@ -301,6 +341,8 @@ int main()
     TestWithDef();
 
     TestWithStore();
+
+    DinamicCastFunc();
 
     return 0;
 }
