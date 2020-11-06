@@ -50,6 +50,7 @@ public:
     {
         return (name == "Shape");
     }
+
     virtual void getCoord()
     {
         cout << classname() << "(" << x << ", " << y << ")\n";
@@ -81,6 +82,7 @@ public:
     //Переопределяемый метод
     void oneStep()
     {
+        cout << "Steps from Shape\n";
         ++x;
         ++y;
     }
@@ -98,7 +100,6 @@ public:
             Round();
             --amount;
         }
-        cout << '\n';
     }
 
     virtual void Round()
@@ -160,6 +161,7 @@ public:
 
     void oneStep()
     {
+        cout << "Steps from Circle\n";
         x += r;
         y += r;
     }
@@ -230,6 +232,7 @@ public:
 
 class Rectangle : public Shape
 {
+protected:
     int width;
     int height;
 public:
@@ -269,6 +272,7 @@ public:
 
     void oneStep()
     {
+        cout << "Steps from Rectanlge\n";
         x += width;
         y += height;
     }
